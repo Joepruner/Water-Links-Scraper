@@ -1,0 +1,5 @@
+// Welcome to MongoDB Runner editor, please keep 'db' instance.
+// All methods which are compitable with MongoDB NodeJS driver can be used in this editor.
+// (http://mongodb.github.io/node-mongodb-native/3.1/api/Db.html)
+// var query = {quality:1};
+db.collection("water_links").find({quality:{$gt:1}}).toArray();

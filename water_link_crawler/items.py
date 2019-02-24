@@ -10,6 +10,9 @@ import scrapy
 
 class WaterLink(scrapy.Item):
     referer_url = scrapy.Field()
+    match_count = scrapy.Field()
+    quality = scrapy.Field()
+    high_quality = scrapy.Field()
     match_url = scrapy.Field()
     relevent_text = scrapy.Field()
     found_in = scrapy.Field()
