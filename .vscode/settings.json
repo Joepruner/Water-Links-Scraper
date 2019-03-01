@@ -1,3 +1,4 @@
 {
-    "python.linting.pylintEnabled": true
+    "python.linting.pylintEnabled": false,
+    "python.pythonPath": "/home/joseph/.pyenv/versions/3.6.5/bin/python"
 }
