@@ -19,13 +19,15 @@ import json
 
 class WaterlinksSpider(CrawlSpider):
     name = 'waterlinks'
-    start_urls = [
-        'https://www.canadianwater.directory/bc/water-supply-resources']
+    start_urls = ['https://www.obwb.ca/']
+    hops_from_start_root = 0;
+
+    referer_root = start_urls[0];
 
     reject_href_regex = r"""(?imx)^(.*\#.*)$|^(\/)$|.*(\?).*|
         .*(login|regist(er)?(ration)?|advertisements?).*"""
 
-    # todo How can this avoid looking for beggings of words that aren't words?
+    # todo How can this avoid looking for begginings of words that aren't words?
     match_words_regex = r"""(?imx)(?=((waste)?water|h2o|drink(ing)?|drainage|wells?|irrigat(e)?
         (ion)?(ing)?|hydrat(e)?(i(on)?(ng)?)?|pollut(ed)?(i(on)?(ng)?)))"""
 
@@ -34,30 +36,46 @@ class WaterlinksSpider(CrawlSpider):
         (?:qualit(ies)?y?|grades?|conditions?|make-?up|classifications?|ranks?|resources?)
         (.){0,50}(?:water)"""
 
+    referer_root_regex = r'(?ix)^http.?://.*?/'
+
     def write_headers():
         with open('links.csv', 'a', newline='') as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',')
-            csv_writer.writerow(['referer', 'match_count', 'quality', 'high_quality',
-                                 'high_quality_scope', 'link', 'relevent_text', 'found_in'])
+            csv_writer.writerow(['referer_root', 'referer_page', 'match_count', 'quality', 'high_quality',
+                                 'high_quality_scope', 'link', 'match_words', 'found_in', 'hops_from_start_root'])
 
-    # todo override parse function, with own function that includes distance from root. 
+    # todo override parse function, with own function that includes distance from root.
     def parse(self, response):
 
         soup = BeautifulSoup(response.text, 'lxml')
         soup = soup.find_all('a')
-        referer = response.url
+        referer_page = response.url
+
+        new_root = re.findall(self.referer_root_regex, str(referer_page))[0];
+
+        if self.referer_root != new_root:
+            self.referer_root = new_root
+            self.hops_from_start_root += 1;
+
+
+
         print (response.url)
         print (response.request.url, '\n')
 
         print('\n*******************************************\n')
         links_with_match_count = 0
         for link in soup:
-            # todo calculate mod based on len(scope)
+            # todo calculate mod based on len(scope)?
+            quality = 0
+            is_high_quality = False
+            high_quality_scope = 'N\A'
+            matches = []
+            write = False
             scope = {
                 'href': {'target': link.get('href'), 'mod': 2},
                 'anchor': {'target': link, 'mod': 1.8},
-                'anchor parent': {'target': link.parent, 'mod': .6}}
-            # 'anchor grandparent':{'target':link.parent.parent,'mod':.3}}
+                'anchor_parent': {'target': link.parent, 'mod': .6},
+                'anchor_grandparent':{'target':link.parent.parent,'mod':.3}}
 
             for key, value in scope.items():
                 current_scope = value['target']
@@ -66,40 +84,40 @@ class WaterlinksSpider(CrawlSpider):
                 if not href_self_target_check:
                     results = re.findall(
                         self.match_words_regex, str(current_scope))
-                    if results:
-                        # print(results,'\n')
-                        matches = []
-                        quality = 0
-                        is_high_quality = False
-                        high_quality_scope = 'N\A'
-                        #todo Possibly rewrite search regex with ? operators so multiple matches in single result.
-                        high_quality_check = re.search(
-                            self.high_quality_match_regex, str(current_scope))
-                        if (high_quality_check):
-                            # todo Modify this to count multiple high-quality segments in scope. re.findall
-                            # print("HIGH QUALITY")
-                            quality += 10
-                            is_high_quality = True
-                            high_quality_scope = str(current_scope)
+                    high_quality_check = re.search(
+                        self.high_quality_match_regex, str(current_scope))
 
+                    # todo find better fix for large scopes.
+                    if results and len(str(current_scope)) < 150:
+                        write = True
+                        #todo Possibly rewrite search regex with ? operators so multiple matches in single result.
                         for i, a in enumerate(results):
-                            # print(i, ' ', a[0],' , ',a[1], ' , ', a[2]);
-                            # print(a);
-                            # matches.append(a[0])
-                            # quality += 1
-                    
                             for i in range (0,len(results[0])):
                                 if (a[i] != ''):
                                     matches.append(a[i])
                                     quality += 1
                         # print('\n')
-                        quality += quality*value['mod']
-                        # print('\n Matches' ,matches)
+
+                    # todo Modify this to count multiple high-quality segments in scope. re.findall
+                    if high_quality_check and len(str(current_scope)) < 200:
+                        write = True
+                        quality += 10
+                        is_high_quality = True
+                        high_quality_scope = str(current_scope)
+
+                    quality = quality*value['mod']
+
+                    if key == 'anchor_parent' or key == 'anchor_grandparent':
+                        quality_threshold = 4
+                    else:
+                        quality_threshold = 0
+
+                    if write == True and quality > quality_threshold:
 
                         with open('links.csv', 'a', newline='') as csvfile:
                             csv_writer = csv.writer(csvfile, delimiter=',')
-                            csv_writer.writerow([referer, len(matches), quality, is_high_quality, high_quality_scope, link.get('href'),
-                                                 matches, key])
+                            csv_writer.writerow([new_root, referer_page, len(matches), quality, is_high_quality, high_quality_scope, link.get('href'),
+                            matches, key, self.hops_from_start_root])
                         # il = ItemLoader(item=WaterLink(),response=response)
                         # il.add_value('referer_url',response.url)
                         # il.add_value('match_count',len(matches))
@@ -107,7 +125,7 @@ class WaterlinksSpider(CrawlSpider):
                         # il.add_value('high_quality', is_high_quality)
                         # il.add_value('high_quality_scope', high_quality_scope)
                         # il.add_value('match_url',link.get('href'))
-                        # il.add_value('relevent_text', matches)
+                        # il.add_value('match_words', matches)
                         # il.add_value('found_in', key)
                         # yield il.load_item()
                         yield response.follow(link.get('href'), callback=self.parse)
@@ -124,5 +142,4 @@ WaterlinksSpider.write_headers()
 # https://regex101.com/r/U7j8t1/7
 #Okangan basin waterboard.
 #How far from root.
-#Where are duplictes found. 
-#Email tomorrow. 
+#Where are duplictes found.
