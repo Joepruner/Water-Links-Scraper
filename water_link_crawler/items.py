@@ -9,15 +9,15 @@ import scrapy
 
 
 class WaterLink(scrapy.Item):
-    referer_url = scrapy.Field()
+    previous_url = scrapy.Field()
+    current_root = scrapy.Field()
+    current_page = scrpay.Field()
     match_count = scrapy.Field()
     quality = scrapy.Field()
     high_quality = scrapy.Field()
-    match_url = scrapy.Field()
-    relevent_text = scrapy.Field()
+    high_quality_scope = scrapy.Field()
+    matched_href = scrapy.Field()
+    matched_keywords = scrapy.Field()
     found_in = scrapy.Field()
-
-
-class WaterLinkGroup(scrapy.Item):
-    referer_url = scrapy.Field()
-    num_match_urls = scrapy.Field()
+    hops_from_start_root = scrapy.Field()
+    next_url = scrapy.Field()
