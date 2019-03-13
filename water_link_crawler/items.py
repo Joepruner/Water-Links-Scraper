@@ -9,9 +9,11 @@ import scrapy
 
 
 class WaterLink(scrapy.Item):
-    previous_url = scrapy.Field()
     current_root = scrapy.Field()
-    current_page = scrpay.Field()
+    current_url = scrapy.Field()
+    current_id = scrapy.Field()
+    next_url = scrapy.Field()
+    next_id = scrapy.Field()
     match_count = scrapy.Field()
     quality = scrapy.Field()
     high_quality = scrapy.Field()
@@ -19,5 +21,3 @@ class WaterLink(scrapy.Item):
     matched_href = scrapy.Field()
     matched_keywords = scrapy.Field()
     found_in = scrapy.Field()
-    hops_from_start_root = scrapy.Field()
-    next_url = scrapy.Field()
