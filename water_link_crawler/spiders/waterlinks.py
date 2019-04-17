@@ -29,9 +29,6 @@ class WaterlinksSpider(CrawlSpider):
     #         session.run("create constraint on (link:Link) assert link.current_url is unique")
     link_id = 0
 
-
-
-
     name = 'waterlinks'
     start_urls = ['https://www.obwb.ca/']
 
@@ -161,6 +158,10 @@ class WaterlinksSpider(CrawlSpider):
 WaterlinksSpider.write_headers()
 
 # https://regex101.com/r/U7j8t1/7
+
 # Okangan basin waterboard.
 # How far from root.
 # Where are duplictes found.
+
+#Document purpose
+#replace scope with good character distance measure

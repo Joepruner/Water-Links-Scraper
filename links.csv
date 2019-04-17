@@ -4186,3 +4186,6 @@ current_root,current_page,match_count,quality,high_quality,high_quality_scope,li
 ['https://www2.gov.bc.ca/'],https://www2.gov.bc.ca/gov/content/industry/crown-land-water,1,2,False,N\A,/gov/content/industry/crown-land-water/crown-land/local-government,['water'],href,69
 ['https://www2.gov.bc.ca/'],https://www2.gov.bc.ca/gov/content/industry/crown-land-water,1,2,False,N\A,/gov/content/industry/crown-land-water/crown-land,['water'],href,69
 ['https://www2.gov.bc.ca/'],https://www2.gov.bc.ca/gov/content/industry/crown-land-water,1,2,False,N\A,/gov/content/industry/crown-land-water/rangelands,['water'],href,69
+current_root,current_url,next_url,match_count,quality,high_quality,high_quality_scope,matched_keywords,found_in
+current_root,current_url,next_url,match_count,quality,high_quality,high_quality_scope,matched_keywords,found_in
+current_root,current_url,next_url,match_count,quality,high_quality,high_quality_scope,matched_keywords,found_in

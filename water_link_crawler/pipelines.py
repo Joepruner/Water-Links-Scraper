@@ -74,40 +74,13 @@ class WaterLinkCrawlerPipeline(object):
                     current_id=current_already_visited_id,
                     next_id=next_already_visited_id)
 
+#Distance
 
 
+#visited timestamp and flag.
+#Do a conditional GET to check timestamp for updates.
+#paralellism: One thread creates nodes, while another thread fills them.
+#If a link without any water description is found, search up to a paragraph
+#-ahead and behind for key word data. 
 
-
-
-
-
-
-
-
-
-# class WaterLinkCrawlerPipeline(object):
-#     collection = 'water_links'
-
-#     def __init__(self, neo4j_uri):
-#         self.neo4j_uri = neo4j_uri
-
-#     @classmethod
-#     def from_crawler(cls, crawler):
-#         return cls(
-#             _uri = crawler.settings.get('MONGO_URI'),
-#             mongo_db = crawler.settings.get('MONGO_DB', )
-#         )
-
-#     def open_spider(self, spider):
-#         self.client = MongoClient(self.mongo_uri)
-#         self.db = self.client[self.mongo_db]
-
-#     def close_spider(self, spider):
-#         self.client.close()
-
-#     def process_item(self, item, spider):
-#         self.db[self.collection].insert_one(dict(item))
-#         return item
-
-
-# from pymongo import MongoClient
+#20 hops deep limit
