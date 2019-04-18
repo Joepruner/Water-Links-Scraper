@@ -21,3 +21,5 @@ class WaterLink(scrapy.Item):
     matched_href = scrapy.Field()
     matched_keywords = scrapy.Field()
     found_in = scrapy.Field()
+    time_stamp = scrapy.Field()
+    node_created = scrapy.Field()
