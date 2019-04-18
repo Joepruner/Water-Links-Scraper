@@ -6,11 +6,15 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 from water_link_crawler.spiders.waterlinks import WaterlinksSpider
 from neo4j import GraphDatabase
+import multiprocessing
+import os
 
 
 class WaterLinkCrawlerPipeline(object):
 
     visited_links = {}
+    node_data = {}
+
 
 
     #Add external credentials
@@ -21,16 +25,13 @@ class WaterLinkCrawlerPipeline(object):
     def close(self):
         self._driver.close()
 
-    # def increment_id(self):
-    #     new_id = self.link_id +1
-    #     self.link_id = new_id
-    #     return self.link_id
-
     def process_item(self, item, spider):
 
-        # if (item['current_url'] == item['next_url']):
-        #     return
+        self.node_data[item['current_id'][0]] = item
 
+        #print("\n","\n","\n",self.node_data,"\n","\n","\n")
+
+        #Boolean to check if URL has been visited before.
         current_already_visited = item['current_url'][0] in self.visited_links
         next_already_visited = item['next_url'][0] in self.visited_links
 
@@ -42,6 +43,7 @@ class WaterLinkCrawlerPipeline(object):
                     merge (curr)-[r:LINKS_TO]->(next)""",
                     current_url=item['current_url'][0], current_id=item['current_id'],
                     next_url=item['next_url'][0], next_id=item['next_id'])
+                #Append URL/id key pair to visited URL dict.
                 self.visited_links[item['current_url'][0]] = item['current_id']
                 self.visited_links[item['next_url'][0]] = item['next_id']
             elif (not current_already_visited and next_already_visited):
@@ -74,13 +76,30 @@ class WaterLinkCrawlerPipeline(object):
                     current_id=current_already_visited_id,
                     next_id=next_already_visited_id)
 
-#Distance
+    # def fill_nodes(self, item, spider):
+    #     if self.node_data.__len__ == 0:
+    #         return
+    #     else:
+    #         for node in self.node_data:
+    #             if self.node_data[0]
+
+
+
+
+            # if (item['current_id'][0] in self.node_data):
+            #     print("\n","\n","\n","\n","\n",item['current_id'])
+            #     print(self.node_data[item['current_id'][0]],"\n","\n","\n")
 
 
 #visited timestamp and flag.
 #Do a conditional GET to check timestamp for updates.
 #paralellism: One thread creates nodes, while another thread fills them.
 #If a link without any water description is found, search up to a paragraph
-#-ahead and behind for key word data. 
+#-ahead and behind for key word data.
 
 #20 hops deep limit
+
+#My Thoughts:
+#-I think a list of all visited URL's must be maintained, because we need to be able to
+#search in that list to avoid duplicates
+

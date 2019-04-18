@@ -12,6 +12,7 @@ import pymongo
 import json
 import random
 from neo4j import GraphDatabase
+import datetime
 
 
 # todo Exclude links that link back to current page.
@@ -133,6 +134,8 @@ class WaterlinksSpider(CrawlSpider):
                         il.add_value('high_quality_scope', high_quality_scope)
                         il.add_value('matched_keywords', matches)
                         il.add_value('found_in', key)
+                        il.add_value('time_stamp', datetime.datetime.now())
+                        il.add_value('node_created', False)
                         yield il.load_item()
 
                         # print('\n*******************************************\n')
@@ -155,7 +158,7 @@ class WaterlinksSpider(CrawlSpider):
 
 
 # WaterlinksSpider.neo4j_connect()
-WaterlinksSpider.write_headers()
+#WaterlinksSpider.write_headers()
 
 # https://regex101.com/r/U7j8t1/7
 
