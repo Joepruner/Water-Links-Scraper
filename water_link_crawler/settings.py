@@ -65,7 +65,7 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'water_link_crawler.pipelines.WaterLinkCrawlerPipeline': 300,
+    'water_link_crawler.pipelines.CreateNodeRelationships': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -89,8 +89,8 @@ AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-MONGO_URI = 'mongodb://localhost:27017'
-MONGO_DB =  'water_link_crawler'
+# MONGO_URI = 'mongodb://localhost:27017'
+# MONGO_DB =  'water_link_crawler'
 
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USER = "neo4j"

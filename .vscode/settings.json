@@ -1,4 +1,7 @@
 {
-    "python.linting.pylintEnabled": false,
-    "python.pythonPath": "/home/joepruner/.pyenv/versions/3.6.5/bin/python"
+    "python.pythonPath": "/home/joepruner/.pyenv/versions/3.6.5/bin/python",
+    // "python.envFile": "${workspaceFolder}/.env",
+    "git.ignoreLimitWarning": true,
+    "python.linting.pylintEnabled": true,
+    "python.jediEnabled": false,
 }
