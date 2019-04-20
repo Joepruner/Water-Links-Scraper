@@ -1,21 +1,12 @@
-# -*- coding: utf-8 -*-
 
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-from water_link_crawler.spiders.waterlinks import WaterlinksSpider
+from water_link_crawler.spiders.waterLinksSpider import WaterlinksSpider
 from neo4j import GraphDatabase
-import multiprocessing
+from water_link_crawler.spider_home_base import SpiderHomeBase as shb
+from water_link_crawler.fill_nodes import FillNodes as fn
 import os
 
 
-class WaterLinkCrawlerPipeline(object):
-
-    visited_links = {}
-    node_data = {}
-
-
+class CreateNodeRelationships(object):
 
     #Add external credentials
     def __init__(self):
@@ -27,68 +18,59 @@ class WaterLinkCrawlerPipeline(object):
 
     def process_item(self, item, spider):
 
-        self.node_data[item['current_id'][0]] = item
-
-        #print("\n","\n","\n",self.node_data,"\n","\n","\n")
+        #save node in spider_home_base.py
+        shb.save_node_item(item)
 
         #Boolean to check if URL has been visited before.
-        current_already_visited = item['current_url'][0] in self.visited_links
-        next_already_visited = item['next_url'][0] in self.visited_links
+        current_already_visited = shb.checkVisited(item['current_url'][0])
+        next_already_visited = shb.checkVisited(['next_url'][0])
 
         with self._driver.session() as session:
             if (not current_already_visited and not next_already_visited):
                 session.run(
-                    """create (curr:link {url: $current_url, id: $current_id})
-                    create (next:link {url: $next_url, id: $next_id})
+                    """create (curr:link {url: $current_url, node_id: $current_id})
+                    create (next:link {url: $next_url, node_id: $next_id})
                     merge (curr)-[r:LINKS_TO]->(next)""",
-                    current_url=item['current_url'][0], current_id=item['current_id'],
-                    next_url=item['next_url'][0], next_id=item['next_id'])
+                    current_url=item['current_url'][0], current_id=item['current_id'][0],
+                    next_url=item['next_url'][0], next_id=item['next_id'][0])
                 #Append URL/id key pair to visited URL dict.
-                self.visited_links[item['current_url'][0]] = item['current_id']
-                self.visited_links[item['next_url'][0]] = item['next_id']
+                shb.makeVisited(item['current_url'][0], item['current_id'][0])
+                shb.makeVisited(item['next_url'][0], item['next_id'][0])
             elif (not current_already_visited and next_already_visited):
-                next_already_visited_id = self.visited_links[item['next_url'][0]]
+                next_already_visited_id = shb.getUrlId(item['next_url'][0])
                 session.run(
-                    """create (curr:link {url: $current_url, id: $current_id})
+                    """create (curr:link {url: $current_url, node_id: $current_id})
                     with curr,
-                    match(next:link {id: $next_id})
+                    match(next:link {node_id: $next_id})
                     merge (curr)-[r:LINKS_TO]->(next)""",
-                    current_url=item['current_url'][0], current_id=item['current_id'],
+                    current_url=item['current_url'][0], current_id=item['current_id'][0],
                     next_id=next_already_visited_id)
-                self.visited_links[item['current_url'][0]] = item['current_id']
+                shb.makeVisited(item['current_url'][0], item['current_id'][0])
             elif (current_already_visited and not next_already_visited):
-                current_already_visited_id = self.visited_links[item['current_url'][0]]
+                current_already_visited_id = shb.getUrlId(item['current_url'][0])
                 session.run(
-                    """create (next:link {url: $next_url, id: $next_id})
+                    """create (next:link {url: $next_url, node_id: $next_id})
                     with next
-                    match(curr:link {id: $current_id})
+                    match(curr:link {node_id: $current_id})
                     merge (curr)-[r:LINKS_TO]->(next)""",
-                    next_url=item['next_url'][0], next_id=item['next_id'],
+                    next_url=item['next_url'][0], next_id=item['next_id'][0],
                     current_id=current_already_visited_id)
-                self.visited_links[item['next_url'][0]] = item['next_id']
+                shb.makeVisited(item['next_url'][0], item['next_id'][0])
             elif (current_already_visited and next_already_visited):
-                current_already_visited_id = self.visited_links[item['current_url'][0]]
-                next_already_visited_id = self.visited_links[item['next_url'][0]]
+                current_already_visited_id = shb.getUrlId(item['current_url'][0])
+                next_already_visited_id = shb.getUrlId(item['next_url'][0])
                 session.run(
-                    """match(curr:link {id: $current_id})
-                    match(next:link {id: $next_id})
+                    """match(curr:link {node_id: $current_id})
+                    match(next:link {node_id: $next_id})
                     merge (curr)-[r:LINKS_TO]->(next)""",
                     current_id=current_already_visited_id,
                     next_id=next_already_visited_id)
 
-    # def fill_nodes(self, item, spider):
-    #     if self.node_data.__len__ == 0:
-    #         return
-    #     else:
-    #         for node in self.node_data:
-    #             if self.node_data[0]
+        filler = fn()
+        filler._fill_node()
+        #shb.viewNodeData()
+        #print("\n***************POPPED\n",fn.get_node_data_queue(),"\n***************POPPED\n")
 
-
-
-
-            # if (item['current_id'][0] in self.node_data):
-            #     print("\n","\n","\n","\n","\n",item['current_id'])
-            #     print(self.node_data[item['current_id'][0]],"\n","\n","\n")
 
 
 #visited timestamp and flag.
