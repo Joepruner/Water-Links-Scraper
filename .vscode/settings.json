@@ -1,6 +1,6 @@
 {
-    "python.pythonPath": "/home/joepruner/.pyenv/versions/3.6.5/bin/python",
-    // "python.envFile": "${workspaceFolder}/.env",
+    "python.pythonPath": "/home/joepruner/virtual_workspace/bin/python3.6",
+    "python.envFile": "${workspaceFolder}/.env",
     "git.ignoreLimitWarning": true,
     "python.linting.pylintEnabled": true,
     "python.jediEnabled": false,

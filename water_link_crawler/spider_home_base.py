@@ -1,10 +1,11 @@
 from neo4j import GraphDatabase
+from multiprocessing import Queue
 
 
 #class for multiple, concurrent spiders to track URL and node information
 class SpiderHomeBase():
     visited_links = {}
-    node_data_queue = []
+    node_data_queue = Queue()
 
     @classmethod
     def checkVisited (cls, url):
@@ -24,19 +25,26 @@ class SpiderHomeBase():
 
     @classmethod
     def save_node_item (cls, item):
-        cls.node_data_queue.append(item)
+        cls.node_data_queue.put(item)
+        # cls.node_data_queue.append("5")
+
+    # @classmethod
+    # def view_node_data_queue(cls):
+    #     print("\n***************\n",cls.node_data_queue"\n***************\n")
 
     @classmethod
-    def view_node_data_queue(cls):
-        print("\n***************\n",cls.node_data_queue,"\n***************\n")
-
-    @classmethod
-    def pop_node_data_queue(cls):
-        if not cls.node_data_queue:
-            return False
-        else:
-            return cls.node_data_queue.pop(0)
+    def get_node_data(cls):
+        # if cls.node_data_queue.empty():
+        #     return False
+        # else:
+        return cls.node_data_queue.get()
 
     @classmethod
     def node_data_queue_length(cls):
-        return len(cls.node_data_queue)
+        print("**********QUEUE LENGTH****************\n", cls.node_data_queue.qsize())
+        # time.sleep(5)
+        # return cls.node_data_queue.qsize()
+
+    @classmethod
+    def is_queue_empty(cls):
+        return cls.node_data_queue.empty()

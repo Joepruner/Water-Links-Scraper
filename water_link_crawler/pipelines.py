@@ -2,7 +2,7 @@
 from water_link_crawler.spiders.waterLinksSpider import WaterlinksSpider
 from neo4j import GraphDatabase
 from water_link_crawler.spider_home_base import SpiderHomeBase as shb
-from water_link_crawler.fill_nodes import FillNodes as fn
+# from water_link_crawler.fill_nodes import FillNodes as fn
 import os
 
 
@@ -17,9 +17,8 @@ class CreateNodeRelationships(object):
         self._driver.close()
 
     def process_item(self, item, spider):
-
-        #save node in spider_home_base.py
         shb.save_node_item(item)
+
 
         #Boolean to check if URL has been visited before.
         current_already_visited = shb.checkVisited(item['current_url'][0])
@@ -66,8 +65,8 @@ class CreateNodeRelationships(object):
                     current_id=current_already_visited_id,
                     next_id=next_already_visited_id)
 
-        filler = fn()
-        filler._fill_node()
+
+
         #shb.viewNodeData()
         #print("\n***************POPPED\n",fn.get_node_data_queue(),"\n***************POPPED\n")
 

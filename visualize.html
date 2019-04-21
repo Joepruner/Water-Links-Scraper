@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Neovis.js Simple Example</title>
+        <style type="text/css">
+            html, body {
+                font: 16pt arial;
+            }
+
+            #viz {
+                width: 80vw;
+                height: 80vh;
+                border: 1px solid lightgray;
+                font: 22pt arial;
+            }
+        </style>
+        <script src="https://cdn.neo4jlabs.com/neovis.js/v1.0.0/neovis.js"></script>
+        <script src="https://unpkg.com/neo4j-driver"></script>
+    </head>
+          <script type="text/javascript">
+
+        var viz;
+
+        function draw() {
+            var config = {
+                container_id: "viz",
+                server_url: "bolt://localhost:7687",
+                server_user: "neo4j",
+                server_password: "Skunkbrat9898!",
+                labels: {
+                    "link": {
+                        "caption": "url",
+                        "size": "quality",
+                        "community": "community"
+                    }
+                },
+                relationships: {
+                    "LINKS_TO": {
+                        "thickness": 1,
+                        "caption": false
+                    }
+                },
+                initial_cypher: "MATCH (n)-[r:LINKS_TO]->(m) return *"
+            };
+
+            viz = new NeoVis.default(config);
+            viz.render();
+        }
+    </script>
+
+    <body onload="draw()">
+        <div id="viz"></div>
+    </body>
+
+</html>
+
+
+
+
+

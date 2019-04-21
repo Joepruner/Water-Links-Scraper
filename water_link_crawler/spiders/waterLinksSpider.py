@@ -1,26 +1,42 @@
 # -*- coding: utf-8 -*-
-import sys
+# import sys
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
+#from scrapy.crawler import CrawlerProcess
 from bs4 import BeautifulSoup
 from scrapy.loader import ItemLoader
-from water_link_crawler.items import WaterLink
+# from scrapy.utils.project import get_project_settings
+#from water_link_crawler.items import WaterLink
 import re
-import csv
-import json
 import random
 from neo4j import GraphDatabase
 import datetime
+
 
 # todo Exclude links that link back to current page.
 # todo Create somekind of tree map showing all response url linked together.
 # todo count number of match_urls per referer_url
 # todo Find a way to check how "large" the content of the parent or grandparent is.
 
+class WaterLink(scrapy.Item):
+    current_root = scrapy.Field()
+    current_id = scrapy.Field()
+    current_url = scrapy.Field()
+    next_id = scrapy.Field()
+    next_url = scrapy.Field()
+    quality = scrapy.Field()
+    high_quality = scrapy.Field()
+    high_quality_scope = scrapy.Field()
+    # matched_keywords = scrapy.Field()
+    match_count = scrapy.Field()
+    found_in = scrapy.Field()
+    # time_stamp = scrapy.Field()
+    node_filled = scrapy.Field()
+
 
 class WaterlinksSpider(CrawlSpider):
 
-    link_id = 0
+    link_id = 1
 
     name = 'water_spider_1'
     start_urls = ['https://www.obwb.ca/']
@@ -90,9 +106,9 @@ class WaterlinksSpider(CrawlSpider):
                         quality_threshold = 0
 
                     if write == True and quality > quality_threshold and (response.url != link.get('href')):
-                        current_id = self.link_id + 1
-                        next_id = self.link_id + 2
-                        self.link_id += 2
+                        current_id = self.link_id
+                        next_id = self.link_id + 1
+                        self.link_id += 1
 
                         il = ItemLoader(item=WaterLink(), response=response)
                         il.add_value('current_root', current_root)
@@ -104,9 +120,9 @@ class WaterlinksSpider(CrawlSpider):
                         il.add_value('quality', quality)
                         il.add_value('high_quality', is_high_quality)
                         il.add_value('high_quality_scope', high_quality_scope)
-                        il.add_value('matched_keywords', matches)
+                        # il.add_value('matched_keywords', matches)
                         il.add_value('found_in', key)
-                        il.add_value('time_stamp', datetime.datetime.now())
+                        # il.add_value('time_stamp', datetime.datetime.now())
                         il.add_value('node_filled', False)
                         yield il.load_item()
 
@@ -118,6 +134,10 @@ class WaterlinksSpider(CrawlSpider):
                         break
                 else:
                     break
+
+
+
+
 
 # https://regex101.com/r/U7j8t1/7
 
