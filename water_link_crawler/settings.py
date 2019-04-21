@@ -14,6 +14,8 @@ BOT_NAME = 'water_link_crawler'
 SPIDER_MODULES = ['water_link_crawler.spiders']
 NEWSPIDER_MODULE = 'water_link_crawler.spiders'
 
+LOG_LEVEL = 'INFO'
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'water_link_crawler (+http://www.yourdomain.com)'
