@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-        <title>Neovis.js Simple Example</title>
+        <title>Water Links Visualization</title>
         <style type="text/css">
             html, body {
                 font: 16pt arial;
@@ -16,8 +16,11 @@
         </style>
         <script src="https://cdn.neo4jlabs.com/neovis.js/v1.0.0/neovis.js"></script>
         <script src="https://unpkg.com/neo4j-driver"></script>
+        <script src="https://code.jquery.com/jquery-3.4.0.min.js"
+            integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
+            crossorigin="anonymous"></script>
     </head>
-          <script type="text/javascript">
+        <script type="text/javascript">
 
         var viz;
 
@@ -36,20 +39,44 @@
                 },
                 relationships: {
                     "LINKS_TO": {
-                        "thickness": 1,
                         "caption": false
                     }
+
                 },
-                initial_cypher: "MATCH (n)-[r:LINKS_TO]->(m) return *"
+                arrows: true,
+                initial_cypher: "MATCH (n)-[r:LINKS_TO]->(m) return *",
+                physics: false,
             };
 
             viz = new NeoVis.default(config);
             viz.render();
+
         }
+            var auto_on = false;
+
+            function auto(){
+
+                if (auto_on == false){
+
+                    timer = setInterval(function(){
+
+                        viz.render();
+                    },4000);
+                    auto_on = true;
+                    document.getElementById("toggle_rendering").innerHTML = "Auto-render is on"
+                }
+                else{
+                    clearInterval(timer);
+                    auto_on = false;
+                    document.getElementById("toggle_rendering").innerHTML = "Auto-render is off"
+                }
+                };
+
     </script>
 
     <body onload="draw()">
         <div id="viz"></div>
+        <button id="toggle_rendering" onclick="auto()">Auto-render is off</button>
     </body>
 
 </html>

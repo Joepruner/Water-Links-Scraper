@@ -60,7 +60,7 @@ class WaterlinksSpider(CrawlSpider):
 
         current_root = re.findall(self.current_root_regex, str(response.url))
 
-        print('\n*******************************************\n')
+        # print('\n*******************************************\n')
         links_with_match_count = 0
         for link in soup:
             quality = 0
