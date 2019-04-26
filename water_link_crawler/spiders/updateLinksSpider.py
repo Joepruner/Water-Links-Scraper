@@ -1,42 +1,43 @@
 # -*- coding: utf-8 -*-
 # import sys
 import scrapy
+from scrapy import Request
 from scrapy.spiders import CrawlSpider, Rule
-#from scrapy.crawler import CrawlerProcess
+# from scrapy import http
+# from scrapy import Request
 from bs4 import BeautifulSoup
 from scrapy.loader import ItemLoader
-# from scrapy.utils.project import get_project_settings
-#from water_link_crawler.items import WaterLink
+
+import urllib3
 from water_link_crawler.spider_home_base import SpiderHomeBase as shb
 import re
 import random
 from neo4j import GraphDatabase
 import datetime
+import time
 
 
-class WaterLink(scrapy.Item):
-    current_root = scrapy.Field()
-    current_id = scrapy.Field()
-    current_url = scrapy.Field()
-    next_id = scrapy.Field()
-    next_url = scrapy.Field()
-    quality = scrapy.Field()
-    high_quality = scrapy.Field()
-    high_quality_scope = scrapy.Field()
-    # matched_keywords = scrapy.Field()
-    match_count = scrapy.Field()
-    found_in = scrapy.Field()
-    time_stamp = scrapy.Field()
-    node_filled = scrapy.Field()
+class UpdatedLink(object):
+
+    def __init__(self,quality, high_quality, high_quality_scope,
+        match_count, found_id, time_stamp):
+
+        self.quality = quality
+        self.high_quality = high_quality
+        self.high_quality_scope = high_quality_scope
+        self.match_count = match_count
+        self.found_in = found_in
+        self.time_stamp = time_stamp
 
 
-class WaterLinksSpider(CrawlSpider):
+class UpdateLinksSpider(CrawlSpider):
 
-    link_id = 1
-
-    name = 'water_spider_1'
-    start_urls = ['https://www.obwb.ca/']
-    # start_urls = shb.get_start_url_1()
+    # link_id = 1
+    name = 'update_spider'
+    # start_urls = shb.get_all_visited()
+    _driver = GraphDatabase.driver(
+            "bolt://localhost:7687", auth=("fill_nodes", "neo_fill_nodes"))
+    http = urllib3.PoolManager()
 
     reject_href_regex = r"""(?imx)^(.*\#.*)$|^(\/)$|.*(\?).*|
         .*(login|regist(er)?(ration)?|advertisements?|\.jp(e)?g?|\.png|\.gif|\.tiff).*"""
@@ -48,15 +49,49 @@ class WaterLinksSpider(CrawlSpider):
         (.){0,50}(?:water)"""
     current_root_regex = r'(?ix)^http.?://.*?/'
 
+    @classmethod
+    def get_headers(cls):
+
+        while True:
+            # print('*********INSIDE LOOP',shb.get_all_visited(),'**************')
+            time.sleep(3)
+            visited = shb.get_all_visited()
+            while visited.empty() == False:
+                link = visited.get()
+                # cls.curr_link = link
+                print(link)
+                with cls._driver.session() as session:
+                    db_time = session.run(
+                        """match(n:link {url: $url})
+                        return n.time_stamp""",
+                        url=link)
+                    # print('\n************',db_time,'**********\n')
+
+                response = http.request('GET', link)
+                print(response.headers)
+                # yield Request(link, cls.check_modified(link), method='HEAD' )
+                cls.check_modified(response)
+                # print(response.header['Last-Modified'])
+                # if headers['Last-Modified']
+    @classmethod
+    def check_modified(cls):
+        print("Hello")
+        # with cls._driver.session() as session:
+        #     db_time = session.run(
+        #     """match(n:link {url: $url})
+        #     return n.time_stamp""",url=link)
+
     # todo override parse function, with own function that includes distance from root.
-    def parse(self, response):
+    @classmethod
+    def update_link(cls, response):
+
 
         soup = BeautifulSoup(response.text, 'lxml')
         soup = soup.find_all('a')
 
-        current_root = re.findall(self.current_root_regex, str(response.url))
+        current_root = re.findall(cls.current_root_regex, str(response.url))
+
         shb.get_all_visited()
-        # print('\n',shb.get_all_visited(),'\n')
         links_with_match_count = 0
         for link in soup:
             quality = 0
@@ -72,13 +107,13 @@ class WaterLinksSpider(CrawlSpider):
 
             for key, value in scope.items():
                 current_scope = value['target']
-                href_self_target_check = re.match(
-                    self.reject_href_regex, str(current_scope))
-                if not href_self_target_check:
+                href_cls_target_check = re.match(
+                    cls.reject_href_regex, str(current_scope))
+                if not href_cls_target_check:
                     results = re.findall(
-                        self.match_words_regex, str(current_scope))
+                        cls.match_words_regex, str(current_scope))
                     high_quality_check = re.search(
-                        self.high_quality_match_regex, str(current_scope))
+                        cls.high_quality_match_regex, str(current_scope))
 
                     if results and len(str(current_scope)) < 150:
                         write = True
@@ -102,37 +137,34 @@ class WaterLinksSpider(CrawlSpider):
                         quality_threshold = 0
 
                     if write == True and quality > quality_threshold and (response.url != link.get('href')):
-                        current_id = self.link_id
-                        next_id = self.link_id + 1
-                        self.link_id += 1
+                        current_id = cls.link_id
+                        next_id = cls.link_id + 1
+                        cls.link_id += 1
                         now = datetime.datetime.now()
                         date_time = now.strftime("%Y%m%d%H%M%S")
 
-                        il = ItemLoader(item=WaterLink(), response=response)
-                        il.add_value('current_root', current_root)
-                        il.add_value('current_url', response.url)
-                        il.add_value('current_id', current_id)
-                        il.add_value('next_url', link.get('href'))
-                        il.add_value('next_id', next_id)
-                        il.add_value('match_count', len(matches))
-                        il.add_value('quality', quality)
-                        il.add_value('high_quality', is_high_quality)
-                        il.add_value('high_quality_scope', high_quality_scope)
-                        # il.add_value('matched_keywords', matches)
-                        il.add_value('found_in', key)
-                        il.add_value('time_stamp', date_time)
-                        il.add_value('node_filled', False)
-                        yield il.load_item()
 
-                        request = response.follow(
-                            link.get('href'), callback=self.parse)
-                        yield request
+                        item = UpdatedLink(quality, is_high_quality, high_quality_scope,
+                        len(matches),key, date_time)
+
+                        # il.add_value('match_count', len(matches))
+                        # il.add_value('quality', quality)
+                        # il.add_value('high_quality', is_high_quality)
+                        # il.add_value('high_quality_scope', high_quality_scope)
+                        # il.add_value('matched_keywords', matches)
+                        # il.add_value('found_in', key)
+                        # il.add_value('time_stamp', date_time)
+                        # il.add_value('node_filled', False)
+                        # yield il.load_item()
+
+                        # request = response.follow(
+                        #     link.get('href'), callback=cls.parse)
+                        # yield request
 
                         links_with_match_count = links_with_match_count + 1
                         break
                 else:
                     break
-
 
 
 # https://regex101.com/r/U7j8t1/7

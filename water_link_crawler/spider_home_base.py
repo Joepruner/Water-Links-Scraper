@@ -1,13 +1,30 @@
 from neo4j import GraphDatabase
+import multiprocessing
 from multiprocessing import Queue
+import copy
 
 
 #class for multiple, concurrent spiders to track URL and node information
 class SpiderHomeBase():
+    manager = multiprocessing.Manager()
     _visited_links = {}
+    _visited_links_queue = manager.Queue()
+
     _node_data_queue = Queue()
+    # _start_url_1=['https://www.obwb.ca/']
+    # _start_url_2=['https://www.kelowna.ca/city-services/water-wastewater/drinking-water/drinking-water-quality']
 
     _root_created = False
+
+#*********** URL functions *********
+
+    # @classmethod
+    # def get_start_url_1(cls):
+    #     return  cls._start_url_1
+
+    # @classmethod
+    # def get_start_url_2(cls):
+    #     return  cls._start_url_2
 
     @classmethod
     def is_root_created(cls):
@@ -16,6 +33,11 @@ class SpiderHomeBase():
     @classmethod
     def root_created(cls):
         cls._root_created = True
+
+    @classmethod
+    def get_all_visited(cls):
+        # print(cls._visited_links_queue)
+        return cls._visited_links_queue
 
     @classmethod
     def checkVisited (cls, url):
@@ -32,6 +54,13 @@ class SpiderHomeBase():
     @classmethod
     def makeVisited (cls, url, id):
         cls._visited_links[url] = id
+        cls._visited_links_queue.put(url)
+
+    @classmethod
+    def is_queue_empty(cls):
+        return cls._visited_links_queue().emp
+
+#******** Node function ***************
 
     @classmethod
     def save_node_item (cls, item):
@@ -40,15 +69,12 @@ class SpiderHomeBase():
 
     @classmethod
     def get_node_data(cls):
-        # if cls.node_data_queue.empty():
-        #     return False
-        # else:
         return cls._node_data_queue.get()
 
     @classmethod
     def node_data_queue_length(cls):
         print("**********QUEUE LENGTH****************\n",
-            cls._node_data_queue.qsize())
+        cls._node_data_queue.qsize())
 
     @classmethod
     def is_queue_empty(cls):
