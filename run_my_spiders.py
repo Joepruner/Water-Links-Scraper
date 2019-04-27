@@ -12,7 +12,7 @@ import time
 crawler_process = CrawlerProcess(get_project_settings())
 crawler_process.crawl(WaterLinksSpider)
 
-node_updater_process = Process(target=uls.check_modified)
+node_updater_process = Process(target=uls.get_headers)
 node_filler_process = Process(target=fn.fill_nodes)
 
 node_updater_process.start()

@@ -1,7 +1,7 @@
 
 from water_link_crawler.spiders.waterLinksSpider import WaterLinksSpider as wls
 from neo4j import GraphDatabase
-
+from water_link_crawler import settings
 from water_link_crawler.spider_home_base import SpiderHomeBase as shb
 import os
 
@@ -11,19 +11,13 @@ class CreateNodeRelationships(object):
     #Add external credentials
     def __init__(self):
         self._driver = GraphDatabase.driver(
-            "bolt://localhost:7687", auth=("neo4j", "Skunkbrat9898!"))
+            settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
 
     def close(self):
         self._driver.close()
 
     def process_item(self, item, spider):
         shb.save_node_item(item)
-        # print(item)
-
-        # print("PROCESSING ITEMS")
-        # shb.get_all_visited()
-        # shb.makeVisited()
-
 
         #Boolean to check if URL has been visited before.
         current_already_visited = shb.checkVisited(item['current_url'][0])

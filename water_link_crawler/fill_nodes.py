@@ -2,6 +2,7 @@
 from neo4j import GraphDatabase
 from water_link_crawler.spiders.waterLinksSpider import WaterLinksSpider as wls
 from water_link_crawler.spider_home_base import SpiderHomeBase as shb
+from water_link_crawler import settings
 import time
 import os
 
@@ -10,19 +11,13 @@ class FillNodes():
     @classmethod
     def fill_nodes(cls):
         _driver = GraphDatabase.driver(
-            "bolt://localhost:7687", auth=("fill_nodes", "neo_fill_nodes"))
+            settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
 
         while True:
 
             time.sleep(2)
 
-            # print("FILLING NODES!!!!!!!!!!!!!!")
-            # shb.node_data_queue_length()
-            # print(shb.get_node_data())
-            # link_queue = shb.get_all_visited()
-            # print(link_queue.get())
-            # shb.makeVisited('www.heehawwow.com', 6)
-
+            shb.node_data_queue_length()
 
             while not shb.is_queue_empty():
                 data = shb.get_node_data()

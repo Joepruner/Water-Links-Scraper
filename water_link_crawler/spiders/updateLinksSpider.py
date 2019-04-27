@@ -8,13 +8,16 @@ from scrapy.spiders import CrawlSpider, Rule
 from bs4 import BeautifulSoup
 from scrapy.loader import ItemLoader
 
+import certifi
 import urllib3
+
 from water_link_crawler.spider_home_base import SpiderHomeBase as shb
 import re
 import random
 from neo4j import GraphDatabase
 import datetime
 import time
+from water_link_crawler import settings
 
 
 class UpdatedLink(object):
@@ -36,8 +39,8 @@ class UpdateLinksSpider(CrawlSpider):
     name = 'update_spider'
     # start_urls = shb.get_all_visited()
     _driver = GraphDatabase.driver(
-            "bolt://localhost:7687", auth=("fill_nodes", "neo_fill_nodes"))
-    http = urllib3.PoolManager()
+            settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
+    http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
     reject_href_regex = r"""(?imx)^(.*\#.*)$|^(\/)$|.*(\?).*|
         .*(login|regist(er)?(ration)?|advertisements?|\.jp(e)?g?|\.png|\.gif|\.tiff).*"""
@@ -56,6 +59,7 @@ class UpdateLinksSpider(CrawlSpider):
             # print('*********INSIDE LOOP',shb.get_all_visited(),'**************')
             time.sleep(3)
             visited = shb.get_all_visited()
+            print(visited)
             while visited.empty() == False:
                 link = visited.get()
                 # cls.curr_link = link
@@ -67,15 +71,15 @@ class UpdateLinksSpider(CrawlSpider):
                         url=link)
                     # print('\n************',db_time,'**********\n')
 
-                response = http.request('GET', link)
-                print(response.headers)
+                response = cls.http.request('GET', link)
+                # print(response.headers)
                 # yield Request(link, cls.check_modified(link), method='HEAD' )
-                cls.check_modified(response)
+                cls.check_modified(response.headers)
                 # print(response.header['Last-Modified'])
                 # if headers['Last-Modified']
     @classmethod
-    def check_modified(cls):
-        print("Hello")
+    def check_modified(cls, headers):
+        print(headers['Expect-CT'])
         # with cls._driver.session() as session:
         #     db_time = session.run(
         #     """match(n:link {url: $url})
