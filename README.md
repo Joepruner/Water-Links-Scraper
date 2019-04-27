@@ -2,26 +2,25 @@
 
 <p>Water-Links-Scraper is a web crawler designed to start from a root web page, 
 retreive all the hyperlinks, and analyze which links are more related to content 
-regarding water quality, and related water quality topics. It will then </p>
+regarding water quality, and related water quality topics. All links will be assigned a content rating and inserted into the graph database, Neo4j, their connections to eachother can be stored as relationships. 
 
 <h3> Installing Scrapy </h3>
-<p>Scrapy requires Python 2.7 or Python 3.4 and above to run.</p>
-If you're using Anaconda or Miniconda, scrapy can be installed with the command:</br>
-<b>$: conda install -c conda-forge scrapy</b><br  /><br  />
+<p>Follow the instructions on <a href='http://doc.scrapy.org/en/latest/intro/install.html'>this page</a> to install Scrapy. It is reccommended to follow the virtual environment install option.</p>
 
-<p>Scrapy can also be installed using pip:<br  />
-<b>$: pip install scrapy</b></p>
-<p>Please check the
-<a href="https://docs.scrapy.org/en/latest/intro/install.html#intro-install-platform-notes">
-operating system specific guide</a> for more installation details.</p>
+<h3> Installing Neo4j </h3>
+<p>Follow the instruction on <a href='https://neo4j.com/docs/operations-manual/current/installation/'> to install Neo4j.</a></p>
 
-<p>It is highly reccomended to install Scrapy <a href="https://virtualenv.pypa.io/en/stable/installation/">
-within a virtual environment</a>,
-so that Scrapy Python packages do not conflict with any already-installed Python system 
-packages</p>
+<h3> Dependencies </h3>
+<ul>
+  <li><a href='https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-beautiful-soup'>BeautifulSoup4</a>(for page parsing)</li>
+  <li><a href='https://pypi.org/project/certifi/'>certifi </a>(SSL for getting headers)</li>
+  <li><a href='https://pypi.org/project/urllib3/'>urllib3 </a>(for getting headers)</li>
+  <li><a href='https://github.com/neo4j-contrib/neovis.js/'>Neovis.js </a>(for visualize.html)</li>
+  
 
 <p>Clone this repository into your virtual environment, and make sure it is activated
 by running the command:</p>
-</p><b>$: source ~virtual_workspace/bin/activate</b></p>
+<p><b>$: source ~virtual_workspace/bin/activate</b></p>
+<p>then</p>
+<p>$: python run_my_spiders.py </p>
 
-<p>install certifi</p>
