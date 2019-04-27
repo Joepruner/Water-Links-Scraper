@@ -17,6 +17,7 @@ regarding water quality, and related water quality topics. All links will be ass
   <li><a href='https://pypi.org/project/certifi/'>certifi </a>(SSL for getting headers)</li>
   <li><a href='https://pypi.org/project/urllib3/'>urllib3 </a>(for getting headers)</li>
   <li><a href='https://github.com/neo4j-contrib/neovis.js/'>Neovis.js </a>(for visualize.html)</li>
+ </ul>
   
 
 <p>Clone this repository into your virtual environment, and make sure it is activated
