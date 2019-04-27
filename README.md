@@ -43,10 +43,10 @@ by running the command:</p>
        <li> It then creates nodes in the database for each URL with a relationship representing the connection between them, and saves the URLs into class SpiderHomeBase in spider_home_base.py</li>
      </ol>
   <li><b>spider_home_base.py</b></li>
-  <ol>
-    <li> The class SpiderHomeBase is in charge of storing all the visited links, as well as the WaterLinks sent from pipelines.py to later be accessed by UpdateLinksSpider.py, fill_nodes.py and pipelines.py.
-    <li> It must use a multiprocessing queue and multiprocessing manager to transfer data to the get_headers() and fill_nodes() methods in UpdateLinksSpider.py and fill_nodes.py, respectively, since these methods are running as separate processes.    
-  </ol>
+     <ol>
+       <li> The class SpiderHomeBase is in charge of storing all the visited links, as well as the WaterLinks sent from pipelines.py to later be accessed by UpdateLinksSpider.py, fill_nodes.py and pipelines.py.</li>
+       <li> It must use a multiprocessing queue and multiprocessing manager to transfer data to the get_headers() and fill_nodes() methods in UpdateLinksSpider.py and fill_nodes.py, respectively, since these methods are running as separate processes.</li>    
+     </ol>
 </ul>
       
 
