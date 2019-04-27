@@ -5,10 +5,11 @@ retreive all the hyperlinks, and analyze which links are more related to content
 regarding water quality, and related water quality topics. All links will be assigned a content rating and inserted into the graph database, Neo4j, their connections to eachother can be stored as relationships. 
 
 <h3> Installing Scrapy </h3>
-<p>Follow the instructions on <a href='http://doc.scrapy.org/en/latest/intro/install.html'>this page</a> to install Scrapy. It is reccommended to follow the virtual environment install option.</p>
+<p>Follow <a href='http://doc.scrapy.org/en/latest/intro/install.html'> these instructions </a>to install Scrapy.</p>
+<p>It is reccommended to follow the virtual environment install option.</p>
 
 <h3> Installing Neo4j </h3>
-<p>Follow the instruction on <a href='https://neo4j.com/docs/operations-manual/current/installation/'> to install Neo4j.</a></p>
+<p>Follow <a href='https://neo4j.com/docs/operations-manual/current/installation/'>these instructions </a> to install Neo4j.</p>
 
 <h3> Dependencies </h3>
 <ul>
@@ -22,5 +23,5 @@ regarding water quality, and related water quality topics. All links will be ass
 by running the command:</p>
 <p><b>$: source ~virtual_workspace/bin/activate</b></p>
 <p>then</p>
-<p>$: python run_my_spiders.py </p>
+<p><b>$: python run_my_spiders.py</b></p>
 
