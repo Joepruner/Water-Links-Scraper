@@ -9,7 +9,7 @@ regarding water quality, and related water quality topics. All links will be ass
 <p>It is reccommended to follow the virtual environment install option.</p>
 
 <h3> Installing Neo4j </h3>
-<p>Follow <a href='https://neo4j.com/docs/operations-manual/current/installation/'>these instructions </a> to install Neo4j.</p>
+<p>Follow <a href='https://neo4j.com/docs/operations-manual/current/installation/'>these instructions </a> to install Neo4j.Once you've opened the Neo4j browser, create a new user with the credentials listed at the bottom of the "settings.py"  file.</p>
 
 <h3> Dependencies </h3>
 <ul>
