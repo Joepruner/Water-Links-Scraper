@@ -23,3 +23,5 @@ packages</p>
 <p>Clone this repository into your virtual environment, and make sure it is activated
 by running the command:</p>
 </p><b>$: source ~virtual_workspace/bin/activate</b></p>
+
+<p>install certifi</p>
