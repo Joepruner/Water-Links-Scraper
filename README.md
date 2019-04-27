@@ -28,18 +28,25 @@ by running the command:</p>
 
 <h3>Overview of Design</h3>
 <ul>
-  <li><b>run_my_spiders.py:</b> This is the main class. It will launch the WaterLinksSpider, as well as spawn processes for the get_headers and fill_nodes functions.</li>
+  <li><b>run_my_spiders.py:</b> This is the main file. It will launch the WaterLinksSpider, as well as spawn separate processes for the get_headers and fill_nodes functions.</li>
   <li><b>WaterLinksSpider.py:</b> 
     <ol>
-      <li>This spider begins by requesting the web page at the assigned URL in the "start_urls" variable.</li> 
-      <li>When it receives a response, it parses it with BeautifulSoup to retreive all the URLs contained in that page, then applies regex patterns to each URL and it's surrounding text area to find specific language describing water quality, and other water quality related terms.</li> <li>It then assigns each URL a "quality" rating based on the language found, and contructs a URL "item" containing various attributes about that URL, which is then sent to pipelines.py.<li>
+      <li>This class WaterLinksSpider begins by requesting the web page at the assigned URL in the "start_urls" variable.           </li> 
+      <li>When it receives a response, it parses it with BeautifulSoup to retreive all the URLs contained in that page, then applies regex patterns to each URL and it's surrounding text area to find specific language describing water quality, and other water quality related terms.</li> <li>It then assigns each URL a "quality" rating based on the language found, and contructs a URL "item" (class WaterLink) containing various attributes about that URL, which is then sent to class CreateNodeRelationships in pipelines.py.<li>
       <li>The spider then repeats this process, asyncronously sending requests to all the URLs it has found, then parsing and itemizing the responses.</li>
     </ol>
-   <li><b>pipelines.py</b>
+  <li><b>pipelines.py</b></li>
      <ol>
-       <li>This class receives the URL items from WaterLinksSpider.py</li>
-       <li>It then stores that item within spider_home_base.py
+       <li>This class receives WaterLinks from WaterLinksSpider.py</li>
+       <li>It then stores that WaterLink within class SpiderHomeBase in spider_home_base.py</li>
+       <li>It extracts the URL of the page the WaterLink was found on, and extracts the URL of the actual WaterLink then checks whether or not they have been visited already.</li> 
+       <li> It then creates nodes in the database for each URL with a relationship representing the connection between them, and saves the URLs into class SpiderHomeBase in spider_home_base.py</li>
      </ol>
+  <li><b>spider_home_base.py</b></li>
+  <ol>
+    <li> The class SpiderHomeBase is in charge of storing all the visited links, as well as the WaterLinks sent from pipelines.py to later be accessed by UpdateLinksSpider.py, fill_nodes.py and pipelines.py.
+    <li> It must use a multiprocessing queue and multiprocessing manager to transfer data to the get_headers() and fill_nodes() methods in UpdateLinksSpider.py and fill_nodes.py, respectively, since these methods are running as separate processes.    
+  </ol>
 </ul>
       
 
