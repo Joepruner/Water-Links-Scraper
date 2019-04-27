@@ -22,7 +22,7 @@ regarding water quality, and related water quality topics. All links will be ass
 
 <p>Clone this repository into your virtual environment, and make sure it is activated
 by running the command:</p>
-<p><b>$: source ~virtual_workspace/bin/activate</b></p>
+<p><b>$: source ~/virtual_workspace/bin/activate</b></p>
 <p>then</p>
 <p><b>$: python run_my_spiders.py</b></p>
 
