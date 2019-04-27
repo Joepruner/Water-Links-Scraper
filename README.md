@@ -32,7 +32,8 @@ by running the command:</p>
   <li><b>WaterLinksSpider.py:</b> 
     <ol>
       <li>This class WaterLinksSpider begins by requesting the web page at the assigned URL in the "start_urls" variable.           </li> 
-      <li>When it receives a response, it parses it with BeautifulSoup to retreive all the URLs contained in that page, then applies regex patterns to each URL and it's surrounding text area to find specific language describing water quality, and other water quality related terms.</li> <li>It then assigns each URL a "quality" rating based on the language found, and contructs a URL "item" (class WaterLink) containing various attributes about that URL, which is then sent to class CreateNodeRelationships in pipelines.py.<li>
+      <li>When it receives a response, it parses it with BeautifulSoup to retreive all the URLs contained in that page, then applies regex patterns to each URL and it's surrounding text area to find specific language describing water quality, and other water quality related terms.</li> 
+      <li>It then assigns each URL a "quality" rating based on the language found, and contructs a URL "item" (class WaterLink) containing various attributes about that URL, which is then sent to class CreateNodeRelationships in pipelines.py.<li>
       <li>The spider then repeats this process, asyncronously sending requests to all the URLs it has found, then parsing and itemizing the responses.</li>
     </ol>
   <li><b>pipelines.py</b></li>
@@ -46,6 +47,12 @@ by running the command:</p>
      <ol>
        <li> The class SpiderHomeBase is in charge of storing all the visited links, as well as the WaterLinks sent from pipelines.py to later be accessed by UpdateLinksSpider.py, fill_nodes.py and pipelines.py.</li>
        <li> It must use a multiprocessing queue and multiprocessing manager to transfer data to the get_headers() and fill_nodes() methods in UpdateLinksSpider.py and fill_nodes.py, respectively, since these methods are running as separate processes.</li>    
+     </ol>
+  <li><b>fill_nodes.py</b></li>
+     <ol>
+       <li>The method fill_nodes() in class FillNodes is run as a separate process. First it checks whether the _node_data_queue in class SpiderHomeBase is empty.</li>
+       <li> If it is not empty, it will pop a WaterLink from the queue, find the node with the matching id in the database, and insert all the the WaterLink attributes into that node.</li
+       <li> It repeats this process until the _node_data_queue is empty, then waits to check again after a few seconds.</li>
      </ol>
 </ul>
       
