@@ -65,8 +65,16 @@ by running the command:</p>
       <li> The class UpdateLinksSpider does not "crawl" in the same sense as the class WaterLinksSpider, because it does not follow links.</li> 
       <li>It retreives already visited URLs from the class SpiderHomeBase then requests the HTTP headers from that URL.</li>
       <li>Then it compares the 'Last-Modified' header (if there is one) to the timestamp of that URL's node in the database.</li> 
-      <li>If the 'Last-Modified' date is more recent than the node timestamp data, that URL will will be re-processed and updated in the database.</li>
+      <li>If the 'Last-Modified' date is more recent than the node timestamp data, that URL will be re-processed and updated in the database.</li>
     </ol>
 </ul>
+
+<h3>Quality Metric Explained</h3>
+<ol>
+  <li> Each URL is assigned a quality modifier number depending on the scrope where the water quality language is found. This modifier multiplies the quality points accrued from finding water quality related language within that scope.</li>
+  <li> If the language is found within the scope of the href attribute (the URL), that would indicate that there is the highest chance this URL will lead to a webpage containing more water quality language and related content. Because of this, it is assigned the highest modifier.</li>
+  <li> If there is no water quality language found in the href, the scope depth is decreased by one, and the process is repeated in the anchor tag of that href, which has the second highest quality modifier.</li>
+  <li></li>
+</ol>
       
 
