@@ -30,7 +30,7 @@ by running the command:</p>
 <ul>
   <li><b>run_my_spiders.py:</b> This is the main class. It will launch the WaterLinksSpider, as well as spawn processes for the get_headers and fill_nodes functions.</li>
   <li><b>WaterLinksSpider.py:</b> 
-    <ol>
+    <ol type="1">
       <li>This spider begins by requesting the web page at the assigned URL in the "start_urls" variable.</li> 
       <li>When it receives a response, it parses it with BeautifulSoup to retreive all the URLs contained in that page, then applies regex patterns to each URL and it's surrounding text area to find specific language describing water quality, and other water quality related terms.</li> <li>It then assigns each URL a "quality" rating based on the language found, and contructs a URL "item" containing various attributes about that URL, which is then sent to pipelines.py.<li>
       <li>The spider then repeats this process, asyncronously sending requests to all the URLs it has found, then parsing and itemizing the responses.</li>
