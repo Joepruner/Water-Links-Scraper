@@ -1,8 +1,8 @@
 
-from water_link_crawler.spiders.waterLinksSpider import WaterlinksSpider
+from water_link_crawler.spiders.waterLinksSpider import WaterLinksSpider as wls
 from neo4j import GraphDatabase
+from water_link_crawler import settings
 from water_link_crawler.spider_home_base import SpiderHomeBase as shb
-# from water_link_crawler.fill_nodes import FillNodes as fn
 import os
 
 
@@ -11,7 +11,7 @@ class CreateNodeRelationships(object):
     #Add external credentials
     def __init__(self):
         self._driver = GraphDatabase.driver(
-            "bolt://localhost:7687", auth=("neo4j", "Skunkbrat9898!"))
+            settings.NEO4J_URI, auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD))
 
     def close(self):
         self._driver.close()
@@ -19,17 +19,16 @@ class CreateNodeRelationships(object):
     def process_item(self, item, spider):
         shb.save_node_item(item)
 
-
-
         #Boolean to check if URL has been visited before.
         current_already_visited = shb.checkVisited(item['current_url'][0])
         next_already_visited = shb.checkVisited(['next_url'][0])
 
         with self._driver.session() as session:
             #If this item is the root node
-            if (item['current_url'][0] == WaterlinksSpider.start_urls[0] and not next_already_visited
-            and not shb.is_root_created()):
+            if (not shb.is_root_created() and item['current_url'][0] ==  wls.start_urls[0]
+            and not next_already_visited):
                 shb.root_created()
+
                 session.run(
                     """create (curr:link {url: $current_url, node_id: $current_id, hops_from_root: $hops})""",
                     # create (next:link {url: $next_url, node_id: $next_id, hops_from_root: $next_hops})
@@ -38,6 +37,7 @@ class CreateNodeRelationships(object):
                     # next_url=item['next_url'][0], next_id=item['next_id'][0], next_hops=1)
                 #Append URL/id key pair to visited URL dict.
                 shb.makeVisited(item['current_url'][0], item['current_id'][0])
+                # shb.makeVisited('www.weewawow.com', 7)
                 # shb.makeVisited(item['next_url'][0], item['next_id'][0])
 
 
@@ -74,7 +74,7 @@ class CreateNodeRelationships(object):
                     merge (curr)-[r:LINKS_TO]->(next)""",
                     current_id=current_already_visited_id,
                     next_id=next_already_visited_id)
-
+            shb.get_all_visited()
 
 
 
@@ -90,31 +90,3 @@ class CreateNodeRelationships(object):
 #-ahead and behind for key word data.
 
 #20 hops deep limit
-
-#My Thoughts:
-#-I think a list of all visited URL's must be maintained, because we need to be able to
-#search in that list to avoid duplicates
-
-
-
-            # if (not current_already_visited and not next_already_visited):
-            #     session.run(
-            #         """create (curr:link {url: $current_url, node_id: $current_id})
-            #         create (next:link {url: $next_url, node_id: $next_id})
-            #         merge (curr)-[r:LINKS_TO]->(next)""",
-            #         current_url=item['current_url'][0], current_id=item['current_id'][0],
-            #         next_url=item['next_url'][0], next_id=item['next_id'][0])
-            #     #Append URL/id key pair to visited URL dict.
-            #     shb.makeVisited(item['current_url'][0], item['current_id'][0])
-            #     shb.makeVisited(item['next_url'][0], item['next_id'][0])
-
-            # elif (not current_already_visited and next_already_visited):
-            #     next_already_visited_id = shb.getUrlId(item['next_url'][0])
-            #     session.run(
-            #         """create (curr:link {url: $current_url, node_id: $current_id})
-            #         with curr,
-            #         match(next:link {node_id: $next_id})
-            #         merge (curr)-[r:LINKS_TO]->(next)""",
-            #         current_url=item['current_url'][0], current_id=item['current_id'][0],
-            #         next_id=next_already_visited_id)
-            #     shb.makeVisited(item['current_url'][0], item['current_id'][0])

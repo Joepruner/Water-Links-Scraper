@@ -7,16 +7,12 @@ from bs4 import BeautifulSoup
 from scrapy.loader import ItemLoader
 # from scrapy.utils.project import get_project_settings
 #from water_link_crawler.items import WaterLink
+from water_link_crawler.spider_home_base import SpiderHomeBase as shb
 import re
 import random
 from neo4j import GraphDatabase
 import datetime
 
-
-# todo Exclude links that link back to current page.
-# todo Create somekind of tree map showing all response url linked together.
-# todo count number of match_urls per referer_url
-# todo Find a way to check how "large" the content of the parent or grandparent is.
 
 class WaterLink(scrapy.Item):
     current_root = scrapy.Field()
@@ -30,16 +26,17 @@ class WaterLink(scrapy.Item):
     # matched_keywords = scrapy.Field()
     match_count = scrapy.Field()
     found_in = scrapy.Field()
-    # time_stamp = scrapy.Field()
+    time_stamp = scrapy.Field()
     node_filled = scrapy.Field()
 
 
-class WaterlinksSpider(CrawlSpider):
+class WaterLinksSpider(CrawlSpider):
 
     link_id = 1
 
     name = 'water_spider_1'
     start_urls = ['https://www.obwb.ca/']
+    # start_urls = shb.get_start_url_1()
 
     reject_href_regex = r"""(?imx)^(.*\#.*)$|^(\/)$|.*(\?).*|
         .*(login|regist(er)?(ration)?|advertisements?|\.jp(e)?g?|\.png|\.gif|\.tiff).*"""
@@ -54,13 +51,12 @@ class WaterlinksSpider(CrawlSpider):
     # todo override parse function, with own function that includes distance from root.
     def parse(self, response):
 
-
         soup = BeautifulSoup(response.text, 'lxml')
         soup = soup.find_all('a')
 
         current_root = re.findall(self.current_root_regex, str(response.url))
-
-        # print('\n*******************************************\n')
+        shb.get_all_visited()
+        # print('\n',shb.get_all_visited(),'\n')
         links_with_match_count = 0
         for link in soup:
             quality = 0
@@ -109,6 +105,8 @@ class WaterlinksSpider(CrawlSpider):
                         current_id = self.link_id
                         next_id = self.link_id + 1
                         self.link_id += 1
+                        now = datetime.datetime.now()
+                        date_time = now.strftime("%Y%m%d%H%M%S")
 
                         il = ItemLoader(item=WaterLink(), response=response)
                         il.add_value('current_root', current_root)
@@ -122,7 +120,7 @@ class WaterlinksSpider(CrawlSpider):
                         il.add_value('high_quality_scope', high_quality_scope)
                         # il.add_value('matched_keywords', matches)
                         il.add_value('found_in', key)
-                        # il.add_value('time_stamp', datetime.datetime.now())
+                        il.add_value('time_stamp', date_time)
                         il.add_value('node_filled', False)
                         yield il.load_item()
 
@@ -134,8 +132,6 @@ class WaterlinksSpider(CrawlSpider):
                         break
                 else:
                     break
-
-
 
 
 

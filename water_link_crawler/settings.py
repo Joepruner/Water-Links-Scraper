@@ -15,6 +15,8 @@ SPIDER_MODULES = ['water_link_crawler.spiders']
 NEWSPIDER_MODULE = 'water_link_crawler.spiders'
 
 LOG_LEVEL = 'INFO'
+# LOG_LEVEL = 'DEBUG'
+# LOG_LEVEL = 'CRITICAL'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -24,7 +26,7 @@ LOG_LEVEL = 'INFO'
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+# CONCURRENT_REQUESTS = 200
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -35,7 +37,7 @@ ROBOTSTXT_OBEY = True
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-#COOKIES_ENABLED = False
+# COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -91,9 +93,7 @@ AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-# MONGO_URI = 'mongodb://localhost:27017'
-# MONGO_DB =  'water_link_crawler'
 
 NEO4J_URI = "bolt://localhost:7687"
-NEO4J_USER = "neo4j"
-NEO4J_PASSWORD = "Skunkbrat9898!"
+NEO4J_USER = "scott"
+NEO4J_PASSWORD = "compsci"
