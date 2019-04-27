@@ -72,9 +72,13 @@ by running the command:</p>
 <h3>Quality Metric Explained</h3>
 <ol>
   <li> Each URL is assigned a quality modifier number depending on the scrope where the water quality language is found. This modifier multiplies the quality points accrued from finding water quality related language within that scope.</li>
-  <li> If the language is found within the scope of the href attribute (the URL), that would indicate that there is the highest chance this URL will lead to a webpage containing more water quality language and related content. Because of this, it is assigned the highest modifier.</li>
-  <li> If there is no water quality language found in the href, the scope depth is decreased by one, and the process is repeated in the anchor tag of that href, which has the second highest quality modifier.</li>
-  <li></li>
+  <li> If the language is found within the scope of the href attribute (the URL), that would indicate that there is the highest chance this URL will lead to a webpage containing more water quality language and related content. Because of this, it is assigned the highest modifier, 2.</li>
+  <li> If there is no water quality language found in the href, the scope depth is decreased by one, and the process is repeated in the anchor tag of that href, which has the second highest quality modifier, 1.8.</li>
+  <li> The process is continued with the parent of the anchor, then the grandparent of the anchor, which have the third and fourth largest quality modifers, 0.6 and 0.3, respectively.</li>
 </ol>
+<ul>
+  <li> Each water quality related word is worth 1 quality point. So if the words "water", "drinking", and "polluted" were found within the parent scope, the quality rating would be 3*0.6 = 1.8.</li>
+  <li> A scope is considered high quality when the word "water" is found within a certain character distance of the word "quality" or similar words such as "condition" or "resources". This will add 10 points to it's quality rating.</li>
+ </ul>
       
 
