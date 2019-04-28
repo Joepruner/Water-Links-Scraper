@@ -52,48 +52,42 @@ class UpdateLinksSpider(CrawlSpider):
         (.){0,50}(?:water)"""
     current_root_regex = r'(?ix)^http.?://.*?/'
 
+    time_format = "%d%m%Y%H%M%S"
+
     @classmethod
     def get_headers(cls):
 
         while True:
-            # print('*********INSIDE LOOP',shb.get_all_visited(),'**************')
             time.sleep(3)
+            #Get the list of all visited links.
             visited = shb.get_all_visited()
-            print(visited)
             while visited.empty() == False:
                 link = visited.get()
-                # cls.curr_link = link
-                print(link)
-                with cls._driver.session() as session:
-                    db_time = session.run(
-                        """match(n:link {url: $url})
-                        return n.time_stamp""",
-                        url=link)
-                    # print('\n************',db_time,'**********\n')
-
-                response = cls.http.request('GET', link)
-                # print(response.headers)
-                # yield Request(link, cls.check_modified(link), method='HEAD' )
-                cls.check_modified(response.headers)
-                # print(response.header['Last-Modified'])
-                # if headers['Last-Modified']
+                url_response = cls.http.request('GET', link)
+                cls.check_modified(url_response.headers, url_response, link)
     @classmethod
-    def check_modified(cls, headers):
-        print(headers['Expect-CT'])
-        # with cls._driver.session() as session:
-        #     db_time = session.run(
-        #     """match(n:link {url: $url})
-        #     return n.time_stamp""",url=link)
+    def check_modified(cls, headers, url_response, link):
+        with cls._driver.session() as session:
+            db_time = session.run(
+                """match(n:link {url: $url})
+                return n.time_stamp""",url=link)
+
+            if headers['Last-Modified']:
+                if datetime.strptime(headers['Last-Modified'],cls.time_format) > db_time:
+                    cls.update_link(url_response,link)
+                    print("Last-Modified timestamp  is more recent than database timestamp ")
+            else:
+                print("No Last-Modified header provided.")
+
 
     # todo override parse function, with own function that includes distance from root.
     @classmethod
-    def update_link(cls, response):
+    def update_link(cls, url_response, link):
 
-
-        soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(url_response.text, 'lxml')
         soup = soup.find_all('a')
 
-        current_root = re.findall(cls.current_root_regex, str(response.url))
+        current_root = re.findall(cls.current_root_regex, str(url_response.url))
 
         shb.get_all_visited()
         links_with_match_count = 0
@@ -140,7 +134,7 @@ class UpdateLinksSpider(CrawlSpider):
                     else:
                         quality_threshold = 0
 
-                    if write == True and quality > quality_threshold and (response.url != link.get('href')):
+                    if write == True and quality > quality_threshold and (url_response.url != link.get('href')):
                         current_id = cls.link_id
                         next_id = cls.link_id + 1
                         cls.link_id += 1
@@ -150,6 +144,9 @@ class UpdateLinksSpider(CrawlSpider):
 
                         item = UpdatedLink(quality, is_high_quality, high_quality_scope,
                         len(matches),key, date_time)
+
+                        print(item)
+                        print(url_response)
 
                         # il.add_value('match_count', len(matches))
                         # il.add_value('quality', quality)

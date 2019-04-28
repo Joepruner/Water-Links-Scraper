@@ -20,4 +20,9 @@ node_filler_process.start()
 
 crawler_process.start()
 
-
+#Explain Metrics check
+#Overview of design check
+#Lessons learned check
+#Future direction check
+#Add try catch blocks
+#code comments

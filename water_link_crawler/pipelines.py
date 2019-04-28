@@ -82,6 +82,7 @@ class CreateNodeRelationships(object):
         #print("\n***************POPPED\n",fn.get_node_data_queue(),"\n***************POPPED\n")
 
 
+#todo clean up zombie processes
 
 #visited timestamp and flag.
 #Do a conditional GET to check timestamp for updates.

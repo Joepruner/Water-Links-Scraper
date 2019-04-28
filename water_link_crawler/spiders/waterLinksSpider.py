@@ -1,12 +1,7 @@
-# -*- coding: utf-8 -*-
-# import sys
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
-#from scrapy.crawler import CrawlerProcess
 from bs4 import BeautifulSoup
 from scrapy.loader import ItemLoader
-# from scrapy.utils.project import get_project_settings
-#from water_link_crawler.items import WaterLink
 from water_link_crawler.spider_home_base import SpiderHomeBase as shb
 import re
 import random
@@ -106,7 +101,8 @@ class WaterLinksSpider(CrawlSpider):
                         next_id = self.link_id + 1
                         self.link_id += 1
                         now = datetime.datetime.now()
-                        date_time = now.strftime("%Y%m%d%H%M%S")
+
+                        date_time = now.strftime("%d%m%Y%H%M%S")
 
                         il = ItemLoader(item=WaterLink(), response=response)
                         il.add_value('current_root', current_root)
