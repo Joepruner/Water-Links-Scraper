@@ -81,4 +81,10 @@ by running the command:</p>
   <li> A scope is considered high quality when the word "water" is found within a certain character distance of the word "quality" or similar words such as "condition" or "resources". This will add 10 points to it's quality rating.</li>
  </ul>
       
-
+<h3><b>Future Functionality</b></h3>
+<ul>
+  <li>Natural language processing for better link quality recognition using Python NLTK.
+  <li>Traversal of JavaScripts links using Scrapy Splash.</li>
+  <li>The ability to download and parse PDFs, and other text files.</li>
+  
+    
