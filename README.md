@@ -83,8 +83,10 @@ by running the command:</p>
       
 <h3><b>Future Functionality</b></h3>
 <ul>
-  <li>Natural language processing for better link quality recognition using Python NLTK.
-  <li>Traversal of JavaScripts links using Scrapy Splash.</li>
+  <li>Natural language processing for better link quality recognition using Python NLTK.</li>
+  <li>Run multiple spiders starting from differnt URLs</li>
+  <li>Traversal of JavaScript links using Scrapy Splash.</li>
   <li>The ability to download and parse PDFs, and other text files.</li>
+</ul>
   
     
