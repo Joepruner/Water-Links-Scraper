@@ -61,12 +61,12 @@ by running the command:</p>
       <li> It repeats this process until the _node_data_queue is empty, then waits to check again after a few seconds.</li>
     </ol>
   
-  <b>UpdateLinksSpider.py</b> (not fully functional, can only retrieve)
+  <b>UpdateLinksSpider.py</b> (not fully functional, can only retrieve and compare timestamps)
     <ol>
       <li> The class UpdateLinksSpider does not "crawl" in the same sense as the class WaterLinksSpider, because it does not follow links.</li> 
       <li>It retrieves already visited URLs from the class SpiderHomeBase then requests the HTTP headers from that URL.</li>
       <li>Then it compares the 'Last-Modified' header (if there is one) to the timestamp of that URLs node in the database.</li> 
-      <li>If the 'Last-Modified' date is more recent than the node timestamp data, that URL will be re-processed and updated in the database.</li>
+      <li>If the 'Last-Modified' date is more recent than the node timestamp data, that URL will be re-processed and updated in the database.(not functional yet)</li>
     </ol>
 
 <h3>Quality Metric Explained</h3>
