@@ -3,11 +3,14 @@ import multiprocessing
 from multiprocessing import Queue
 
 
-#class for multiple, concurrent spiders to track URL and node information
+#class for multiple, concurrent spiders or classes to track URL and node information
 class SpiderHomeBase():
     manager = multiprocessing.Manager()
+    manager2 = multiprocessing.Manager()
     _visited_links = {}
     _visited_links_queue = manager.Queue()
+    _needs_update_queue = manager2.Queue()
+
 
     _node_data_queue = Queue()
     _root_created = False
@@ -46,8 +49,19 @@ class SpiderHomeBase():
 
     @classmethod
     def is_queue_empty(cls):
-        return cls._visited_links_queue().emp
+        return cls._visited_links_queue.empty()
 
+    @classmethod
+    def _save_needs_update(cls, url):
+        cls._needs_update_queue.put(url)
+
+    @classmethod
+    def _get_needs_update(cls):
+        return cls._needs_update_queue.get()
+
+    @classmethod
+    def _is_needs_update_empty(cls):
+        return cls._needs_update_queue.empty()
 #******** Node function ***************
 
     @classmethod

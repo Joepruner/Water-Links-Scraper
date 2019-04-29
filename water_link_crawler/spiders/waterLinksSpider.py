@@ -1,4 +1,5 @@
 import scrapy
+from scrapy import Request
 from scrapy.spiders import CrawlSpider, Rule
 from bs4 import BeautifulSoup
 from scrapy.loader import ItemLoader
@@ -7,6 +8,8 @@ import re
 import random
 from neo4j import GraphDatabase
 import datetime
+import certifi
+# import urllib3
 
 
 class WaterLink(scrapy.Item):
@@ -21,8 +24,8 @@ class WaterLink(scrapy.Item):
     # matched_keywords = scrapy.Field()
     match_count = scrapy.Field()
     found_in = scrapy.Field()
-    time_stamp = scrapy.Field()
-    node_filled = scrapy.Field()
+    timestamp = scrapy.Field()
+    needs_update = scrapy.Field()
 
 
 class WaterLinksSpider(CrawlSpider):
@@ -43,16 +46,30 @@ class WaterLinksSpider(CrawlSpider):
         (.){0,50}(?:water)"""
     current_root_regex = r'(?ix)^http.?://.*?/'
 
-    # todo override parse function, with own function that includes distance from root.
+    # http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+
+
+
+    #From this class, python internally calls the parse method for received responses.
+    @classmethod
     def parse(self, response):
+        # is_an_update = False
+
+
+        #Check to see if any links need to be updated
+        #and save the current response to parse after.
+        if shb._is_needs_update_empty() == False:
+            # is_an_update = True
+            # original_response = response
+            Request(url=shb._get_needs_update())
+
+
 
         soup = BeautifulSoup(response.text, 'lxml')
         soup = soup.find_all('a')
 
         current_root = re.findall(self.current_root_regex, str(response.url))
         shb.get_all_visited()
-        # print('\n',shb.get_all_visited(),'\n')
-        links_with_match_count = 0
         for link in soup:
             quality = 0
             is_high_quality = False
@@ -102,7 +119,7 @@ class WaterLinksSpider(CrawlSpider):
                         self.link_id += 1
                         now = datetime.datetime.now()
 
-                        date_time = now.strftime("%d%m%Y%H%M%S")
+                        node_last_modified = now.strftime("%d%m%Y%H%M%S")
 
                         il = ItemLoader(item=WaterLink(), response=response)
                         il.add_value('current_root', current_root)
@@ -116,15 +133,19 @@ class WaterLinksSpider(CrawlSpider):
                         il.add_value('high_quality_scope', high_quality_scope)
                         # il.add_value('matched_keywords', matches)
                         il.add_value('found_in', key)
-                        il.add_value('time_stamp', date_time)
-                        il.add_value('node_filled', False)
+                        il.add_value('timestamp', node_last_modified)
+                        il.add_value('needs_update', is_an_update)
                         yield il.load_item()
 
+                    #Check if
+                    # if is_an_update == False:
                         request = response.follow(
                             link.get('href'), callback=self.parse)
                         yield request
-
-                        links_with_match_count = links_with_match_count + 1
+                    # else:
+                    #     request = original_response.follow(
+                    #         link.get('href'), callback=self.parse)
+                    #     yield request
                         break
                 else:
                     break
