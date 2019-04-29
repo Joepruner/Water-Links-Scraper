@@ -1,30 +1,19 @@
 from neo4j import GraphDatabase
 import multiprocessing
 from multiprocessing import Queue
-import copy
 
 
-#class for multiple, concurrent spiders to track URL and node information
+#class for multiple, concurrent spiders or classes to track URL and node information
 class SpiderHomeBase():
     manager = multiprocessing.Manager()
     _visited_links = {}
     _visited_links_queue = manager.Queue()
 
-    _node_data_queue = Queue()
-    # _start_url_1=['https://www.obwb.ca/']
-    # _start_url_2=['https://www.kelowna.ca/city-services/water-wastewater/drinking-water/drinking-water-quality']
 
+    _node_data_queue = Queue()
     _root_created = False
 
 #*********** URL functions *********
-
-    # @classmethod
-    # def get_start_url_1(cls):
-    #     return  cls._start_url_1
-
-    # @classmethod
-    # def get_start_url_2(cls):
-    #     return  cls._start_url_2
 
     @classmethod
     def is_root_created(cls):
@@ -58,9 +47,9 @@ class SpiderHomeBase():
 
     @classmethod
     def is_queue_empty(cls):
-        return cls._visited_links_queue().emp
+        return cls._visited_links_queue.empty()
 
-#******** Node function ***************
+#******** Node functions ***************
 
     @classmethod
     def save_node_item (cls, item):

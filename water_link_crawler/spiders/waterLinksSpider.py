@@ -1,18 +1,13 @@
-# -*- coding: utf-8 -*-
-# import sys
 import scrapy
+from scrapy import Request
 from scrapy.spiders import CrawlSpider, Rule
-#from scrapy.crawler import CrawlerProcess
 from bs4 import BeautifulSoup
 from scrapy.loader import ItemLoader
-# from scrapy.utils.project import get_project_settings
-#from water_link_crawler.items import WaterLink
 from water_link_crawler.spider_home_base import SpiderHomeBase as shb
 import re
 import random
 from neo4j import GraphDatabase
 import datetime
-
 
 class WaterLink(scrapy.Item):
     current_root = scrapy.Field()
@@ -26,8 +21,8 @@ class WaterLink(scrapy.Item):
     # matched_keywords = scrapy.Field()
     match_count = scrapy.Field()
     found_in = scrapy.Field()
-    time_stamp = scrapy.Field()
-    node_filled = scrapy.Field()
+    timestamp = scrapy.Field()
+    # needs_update = scrapy.Field()
 
 
 class WaterLinksSpider(CrawlSpider):
@@ -48,16 +43,19 @@ class WaterLinksSpider(CrawlSpider):
         (.){0,50}(?:water)"""
     current_root_regex = r'(?ix)^http.?://.*?/'
 
-    # todo override parse function, with own function that includes distance from root.
+    #From this class, python internally calls the parse method for received responses.
+    @classmethod
     def parse(self, response):
 
-        soup = BeautifulSoup(response.text, 'lxml')
-        soup = soup.find_all('a')
+        try:
+            soup = BeautifulSoup(response.text, 'lxml')
+            soup = soup.find_all('a')
+        except:
+            print("The response is not an HTML file. May be image or PDF.")
+            return
 
         current_root = re.findall(self.current_root_regex, str(response.url))
         shb.get_all_visited()
-        # print('\n',shb.get_all_visited(),'\n')
-        links_with_match_count = 0
         for link in soup:
             quality = 0
             is_high_quality = False
@@ -70,6 +68,7 @@ class WaterLinksSpider(CrawlSpider):
                 'anchor_parent': {'target': link.parent, 'mod': .6},
                 'anchor_grandparent': {'target': link.parent.parent, 'mod': .3}}
 
+            #iterate through each URL on the page and process
             for key, value in scope.items():
                 current_scope = value['target']
                 href_self_target_check = re.match(
@@ -106,7 +105,8 @@ class WaterLinksSpider(CrawlSpider):
                         next_id = self.link_id + 1
                         self.link_id += 1
                         now = datetime.datetime.now()
-                        date_time = now.strftime("%Y%m%d%H%M%S")
+
+                        node_last_modified = now.strftime("%d%m%Y%H%M%S")
 
                         il = ItemLoader(item=WaterLink(), response=response)
                         il.add_value('current_root', current_root)
@@ -120,26 +120,13 @@ class WaterLinksSpider(CrawlSpider):
                         il.add_value('high_quality_scope', high_quality_scope)
                         # il.add_value('matched_keywords', matches)
                         il.add_value('found_in', key)
-                        il.add_value('time_stamp', date_time)
-                        il.add_value('node_filled', False)
+                        il.add_value('timestamp', node_last_modified)
+                        # il.add_value('needs_update', is_an_update)
                         yield il.load_item()
 
                         request = response.follow(
                             link.get('href'), callback=self.parse)
                         yield request
-
-                        links_with_match_count = links_with_match_count + 1
                         break
                 else:
                     break
-
-
-
-# https://regex101.com/r/U7j8t1/7
-
-# Okangan basin waterboard.
-# How far from root.
-# Where are duplictes found.
-
-#Document purpose
-#replace scope with good character distance measure

@@ -30,22 +30,16 @@ class FillNodes():
                         set n.quality = $quality
                         set n.high_quality = $high_quality
                         set n.high_quality_scope = $high_quality_scope
-
                         set n.match_count = $match_count
                         set n.found_in = $found_in
-                        set n.time_stamp = $time_stamp
-                        set n.node_filled = $node_filled""",
+                        set n.timestamp = $timestamp""",
                         id=data['current_id'][0],
                         root=data['current_root'][0],
                         quality=data['quality'][0],
                         high_quality=data['high_quality'][0],
                         high_quality_scope=data['high_quality_scope'][0],
-                        # matched_keywords=data['matched_keywords'][0],
                         match_count=data['match_count'][0],
                         found_in=data['found_in'][0],
-                        time_stamp=data['time_stamp'][0],
-                        node_filled=True)
-
-# set n.matched_keywords = $matched_keywords
+                        timestamp=data['timestamp'][0])
 
 
