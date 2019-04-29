@@ -22,7 +22,6 @@ class FillNodes():
             while not shb.is_queue_empty():
                 data = shb.get_node_data()
 
-
                 with _driver.session() as session:
 
                     session.run(
@@ -31,22 +30,16 @@ class FillNodes():
                         set n.quality = $quality
                         set n.high_quality = $high_quality
                         set n.high_quality_scope = $high_quality_scope
-
                         set n.match_count = $match_count
                         set n.found_in = $found_in
-                        set n.timestamp = $timestamp
-                        set n.needs_update = $needs_update""",
+                        set n.timestamp = $timestamp""",
                         id=data['current_id'][0],
                         root=data['current_root'][0],
                         quality=data['quality'][0],
                         high_quality=data['high_quality'][0],
                         high_quality_scope=data['high_quality_scope'][0],
-                        # matched_keywords=data['matched_keywords'][0],
                         match_count=data['match_count'][0],
                         found_in=data['found_in'][0],
-                        timestamp=data['timestamp'][0],
-                        needs_update=data['needs_update'][0])
-
-# set n.matched_keywords = $matched_keywords
+                        timestamp=data['timestamp'][0])
 
 

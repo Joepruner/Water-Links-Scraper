@@ -6,10 +6,8 @@ from multiprocessing import Queue
 #class for multiple, concurrent spiders or classes to track URL and node information
 class SpiderHomeBase():
     manager = multiprocessing.Manager()
-    manager2 = multiprocessing.Manager()
     _visited_links = {}
     _visited_links_queue = manager.Queue()
-    _needs_update_queue = manager2.Queue()
 
 
     _node_data_queue = Queue()
@@ -51,18 +49,7 @@ class SpiderHomeBase():
     def is_queue_empty(cls):
         return cls._visited_links_queue.empty()
 
-    @classmethod
-    def _save_needs_update(cls, url):
-        cls._needs_update_queue.put(url)
-
-    @classmethod
-    def _get_needs_update(cls):
-        return cls._needs_update_queue.get()
-
-    @classmethod
-    def _is_needs_update_empty(cls):
-        return cls._needs_update_queue.empty()
-#******** Node function ***************
+#******** Node functions ***************
 
     @classmethod
     def save_node_item (cls, item):

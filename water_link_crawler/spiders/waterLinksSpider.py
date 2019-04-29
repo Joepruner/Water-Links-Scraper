@@ -8,9 +8,6 @@ import re
 import random
 from neo4j import GraphDatabase
 import datetime
-import certifi
-# import urllib3
-
 
 class WaterLink(scrapy.Item):
     current_root = scrapy.Field()
@@ -25,7 +22,7 @@ class WaterLink(scrapy.Item):
     match_count = scrapy.Field()
     found_in = scrapy.Field()
     timestamp = scrapy.Field()
-    needs_update = scrapy.Field()
+    # needs_update = scrapy.Field()
 
 
 class WaterLinksSpider(CrawlSpider):
@@ -46,27 +43,16 @@ class WaterLinksSpider(CrawlSpider):
         (.){0,50}(?:water)"""
     current_root_regex = r'(?ix)^http.?://.*?/'
 
-    # http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
-
-
-
     #From this class, python internally calls the parse method for received responses.
     @classmethod
     def parse(self, response):
-        # is_an_update = False
 
-
-        #Check to see if any links need to be updated
-        #and save the current response to parse after.
-        if shb._is_needs_update_empty() == False:
-            # is_an_update = True
-            # original_response = response
-            Request(url=shb._get_needs_update())
-
-
-
-        soup = BeautifulSoup(response.text, 'lxml')
-        soup = soup.find_all('a')
+        try:
+            soup = BeautifulSoup(response.text, 'lxml')
+            soup = soup.find_all('a')
+        except:
+            print("The response is not an HTML file. May be image or PDF.")
+            return
 
         current_root = re.findall(self.current_root_regex, str(response.url))
         shb.get_all_visited()
@@ -82,6 +68,7 @@ class WaterLinksSpider(CrawlSpider):
                 'anchor_parent': {'target': link.parent, 'mod': .6},
                 'anchor_grandparent': {'target': link.parent.parent, 'mod': .3}}
 
+            #iterate through each URL on the page and process
             for key, value in scope.items():
                 current_scope = value['target']
                 href_self_target_check = re.match(
@@ -134,29 +121,12 @@ class WaterLinksSpider(CrawlSpider):
                         # il.add_value('matched_keywords', matches)
                         il.add_value('found_in', key)
                         il.add_value('timestamp', node_last_modified)
-                        il.add_value('needs_update', is_an_update)
+                        # il.add_value('needs_update', is_an_update)
                         yield il.load_item()
 
-                    #Check if
-                    # if is_an_update == False:
                         request = response.follow(
                             link.get('href'), callback=self.parse)
                         yield request
-                    # else:
-                    #     request = original_response.follow(
-                    #         link.get('href'), callback=self.parse)
-                    #     yield request
                         break
                 else:
                     break
-
-
-
-# https://regex101.com/r/U7j8t1/7
-
-# Okangan basin waterboard.
-# How far from root.
-# Where are duplictes found.
-
-#Document purpose
-#replace scope with good character distance measure

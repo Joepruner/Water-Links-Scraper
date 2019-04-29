@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-# import sys
+
 import scrapy
 from scrapy import Request
 from scrapy.spiders import CrawlSpider, Rule
 from water_link_crawler.spiders.waterLinksSpider import WaterLinksSpider
-# from scrapy import http
-# from scrapy import Request
 from multiprocessing import Queue
 from bs4 import BeautifulSoup
 from scrapy.loader import ItemLoader
@@ -21,7 +18,6 @@ import datetime
 import time
 from water_link_crawler import settings
 import os
-
 
 class UpdateLinksSpider(CrawlSpider):
 
@@ -46,20 +42,17 @@ class UpdateLinksSpider(CrawlSpider):
                 cls.check_modified(url_response.headers, url_response, visited_url)
     @classmethod
     def check_modified(cls, headers, url_response, visited_url):
-        print("Checking headers")
         with cls._driver.session() as session:
             db_node_data = session.run(
                 """match(n:link {url: $url})
                 return n.timestamp""",url=visited_url)
             db_node_timestamp = db_node_data.data()[0]['n.timestamp']
-            # db_node_id = db_node_data.data()[0]['node_id']
-            # make needs update field
-        # try:
+        try:
+            #Hard to test and actual update, but the comparison works
             # if datetime.strptime(headers['Last-Modified'],cls.time_format) > db_node_timestamp:
-            if True:
-                shb._save_needs_update(visited_url)
-                print("Last-Modified timestamp is more recent than database timestamp - Updating node")
+            if headers['Last-Modified']:
+                print("The Last-Modified date is for",visited_url,"is",headers['Last-Modified'])
             else:
                 print("Last-Modified timestamp is older than database timestamp.")
-        # except:
-            # print("No Last-Modified header provided.")
+        except:
+            print("No Last-Modified header provided.")
